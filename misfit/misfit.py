@@ -29,7 +29,8 @@ class Misfit:
     def summary(self, start_date, end_date, detail=False, object_id=None):
         return self._get_object(
             self.api.activity.summary, object_id,
-            start_date=start_date, end_date=end_date, detail=detail)
+            start_date=start_date, end_date=end_date,
+            detail='true' if detail else 'false')
 
     def session(self, start_date, end_date, object_id=None):
         return self._get_object(
