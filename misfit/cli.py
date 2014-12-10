@@ -2,7 +2,7 @@
 """Misfit client
 
 Usage:
-  misfit authenticate --client_id=<client_id> --client_secret=<client_secret> [--config=<config_file>]
+  misfit authorize --client_id=<client_id> --client_secret=<client_secret> [--config=<config_file>]
   misfit profile [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
   misfit device [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
   misfit goal --start_date=<start_date> --end_date=<end_date> [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
@@ -26,12 +26,10 @@ Options:
 """
 from __future__ import absolute_import
 
-import cherrypy
-
 from docopt import docopt
 
 from . import __version__
-from .auth import AuthServer
+from .auth import MisfitAuth
 from .misfit import Misfit
 
 try:
@@ -43,7 +41,7 @@ except ImportError:  # Python 2.x fallback
 class MisfitCli:
     def __init__(self, arguments):
         """
-        Runs the command specified as an argument with options specified
+        Runs the command specified as an argument with the options specified
         """
 
         self.config_file = arguments['--config']
@@ -52,10 +50,10 @@ class MisfitCli:
         self.client_secret = None
         self.access_token = None
 
-        if arguments['authenticate']:
+        if arguments['authorize']:
             self.client_id = arguments['--client_id']
             self.client_secret = arguments['--client_secret']
-            self.authenticate()
+            self.authorize()
         else:
             try:
                 # Fail if config file doesn't exist or is missing information
@@ -63,7 +61,7 @@ class MisfitCli:
             except (IOError, configparser.NoOptionError,
                     configparser.NoSectionError):
                 print('Missing config information, please run '
-                      '"misfit authenticate"')
+                      '"misfit authorize"')
             else:
                 # Everything is good! Get the requested resource(s)
                 self.get_resource(arguments)
@@ -110,20 +108,19 @@ class MisfitCli:
         elif arguments['sleep']:
             print(misfit.sleep(start_date, end_date, object_id))
 
-    def authenticate(self):
+    def authorize(self):
         """
-        Open a browser to the authentication page, spool up a CherryPy to
-        accept the response, and write resulting credentials to a config file.
+        Authorize a user using the browser and a CherryPy server, and write
+        the resulting credentials to a config file.
         """
 
         # Thanks to the magic of docopts, I can be guaranteed to have a
         # a client_id and client_secret
-        auth_server = AuthServer(self.client_id, self.client_secret)
-        auth_server.authenticate()
-        cherrypy.quickstart(auth_server)
+        auth = MisfitAuth(self.client_id, self.client_secret)
+        auth.browser_authorize()
 
         # Write the authentication information to a config file for later use
-        self.write_config(auth_server.access_token)
+        self.write_config(auth.token['access_token'])
 
 
 def main():
