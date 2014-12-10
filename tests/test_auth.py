@@ -26,7 +26,8 @@ class TestMisfitAuth(unittest.TestCase):
         self.kwargs = {
             'redirect_uri': 'http://www.example.com/misfit-auth/',
             'scope': ['public'],
-            'html': "My customized success HTML"
+            'html': 'My customized success HTML',
+            'state': self.state
         }
 
     def test_init(self):
@@ -38,6 +39,10 @@ class TestMisfitAuth(unittest.TestCase):
         # Override args
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         self._verify_member_vars(auth, **self.kwargs)
+        # Check that a new state doesn't get generated to override the value
+        # passed
+        auth.authorize_url()
+        self.assertEqual(auth.state, self.state)
 
     @patch('requests_oauthlib.OAuth2Session.new_state')
     def test_authorize_url(self, new_state_mock):
@@ -126,7 +131,7 @@ class TestMisfitAuth(unittest.TestCase):
             self, auth, redirect_uri='http://127.0.0.1:8080/',
             scope=['public', 'birthday', 'email'], html="""
             <h1>You are now authorized to access the Misfit API!</h1>
-            <br/><h3>You can close this window</h3>"""):
+            <br/><h3>You can close this window</h3>""", state=None):
         """
         Verify all the MisfitAuth member variables are as they should be
         """
@@ -136,6 +141,6 @@ class TestMisfitAuth(unittest.TestCase):
         self.assertEqual(auth.scope, scope)
         self.assertEqual(auth.html, html)
         self.assertEqual(os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'], 'true')
-        self.assertTrue(auth.state is None)
+        self.assertEqual(auth.state, state)
         self.assertTrue(auth.token is None)
         self.assertEqual(type(auth.oauth), OAuth2Session)

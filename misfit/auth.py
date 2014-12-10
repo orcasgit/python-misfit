@@ -14,7 +14,7 @@ from .misfit import API_URL
 
 class MisfitAuth:
     def __init__(self, client_id, client_secret,
-                 redirect_uri='http://127.0.0.1:8080/',
+                 redirect_uri='http://127.0.0.1:8080/', state=None,
                  scope=['public', 'birthday', 'email'], html=None):
         """ Initialize the OAuth2Session """
         self.client_id = client_id
@@ -28,10 +28,11 @@ class MisfitAuth:
         # even though this goes against rfc6749:
         #     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth2/rfc6749/parameters.py#L392
         os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = 'true'
-        self.state = None
         self.token = None
-        self.oauth = OAuth2Session(self.client_id, scope=self.scope,
-                                   redirect_uri=self.redirect_uri)
+        self.state = state
+        self.oauth = OAuth2Session(
+            self.client_id, scope=self.scope, redirect_uri=self.redirect_uri,
+            state=self.state)
 
     def authorize_url(self):
         """
