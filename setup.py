@@ -6,7 +6,8 @@ import re
 from setuptools import setup
 
 
-required = [line for line in open('requirements.txt').read().split("\n")]
+required = [l for l in open('requirements/base.txt').read().split("\n")]
+required_test = [l for l in open('requirements/test.txt').read().split("\n")]
 
 mfinit = open('misfit/__init__.py').read()
 refind = lambda varname: re.search("%s = '([^']+)'" % varname, mfinit).group(1)
@@ -27,6 +28,8 @@ setup(
     entry_points={
         'console_scripts': ['misfit=misfit.cli:main'],
     },
+    test_suite='nose.collector',
+    tests_require=required_test,
     classifiers=(
         'Intended Audience :: Developers',
         'Natural Language :: English',

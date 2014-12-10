@@ -3,5 +3,7 @@ env
 build
 dist
 misfit.egg-info
+.coverage
+.tox
 __pycache__
 *.pyc
