@@ -1,4 +1,7 @@
+import arrow
+import json
 import slumber
+import sys
 
 from oauthlib.oauth2 import Client
 from requests_oauthlib import OAuth2
@@ -16,34 +19,89 @@ class Misfit:
                                (API_URL, user), auth=auth)
 
     def profile(self, object_id=None):
-        return self._get_object(self.api.profile, object_id)
+        return MisfitProfile(self._get_object(self.api.profile, object_id))
 
     def device(self, object_id=None):
-        return self._get_object(self.api.device, object_id)
+        return MisfitDevice(self._get_object(self.api.device, object_id))
 
     def goal(self, start_date, end_date, object_id=None):
-        return self._get_object(
+        goals = self._get_object(
             self.api.activity.goals, object_id,
-            start_date=start_date, end_date=end_date)
+            start_date=start_date, end_date=end_date)['goals']
+        return [MisfitGoal(goal) for goal in goals]
 
     def summary(self, start_date, end_date, detail=False, object_id=None):
-        return self._get_object(
+        summary = self._get_object(
             self.api.activity.summary, object_id,
             start_date=start_date, end_date=end_date,
             detail='true' if detail else 'false')
+        if 'summary' in summary:
+            return [MisfitSummary(summ) for summ in summary['summary']]
+        else:
+            return MisfitSummary(summary)
 
     def session(self, start_date, end_date, object_id=None):
-        return self._get_object(
+        sessions = self._get_object(
             self.api.activity.sessions, object_id,
-            start_date=start_date, end_date=end_date)
+            start_date=start_date, end_date=end_date)['sessions']
+        return [MisfitSession(session) for session in sessions]
 
     def sleep(self, start_date, end_date, object_id=None):
-        return self._get_object(
+        sleeps = self._get_object(
             self.api.activity.sleeps, object_id,
-            start_date=start_date, end_date=end_date)
+            start_date=start_date, end_date=end_date)['sleeps']
+        return [MisfitSleep(sleep) for sleep in sleeps]
 
     def _get_object(self, api_section, object_id=None, **kwargs):
-        api_object = api_section
-        if object_id:
-            api_object = api_section(object_id)
-        return api_object.get(**kwargs)
+        args = (object_id,) if object_id else tuple()
+        return api_section(*args).get(**kwargs)
+
+
+class UnicodeMixin(object):
+    if sys.version_info > (3, 0):
+        __str__ = lambda x: x.__unicode__()
+    else:
+        __str__ = lambda x: unicode(x).encode('utf-8')
+
+
+class MisfitObject(UnicodeMixin):
+    def __init__(self, data):
+        self.data = data
+        for name, value in self.data.items():
+            self.set_value(name, value)
+
+    def set_value(self, name, value):
+        if name in ['date', 'datetime', 'startTime']:
+            setattr(self, name, arrow.get(value))
+        else:
+            setattr(self, name, value)
+
+    def __unicode__(self):
+        return '%s: %s' % (type(self), json.dumps(self.data))
+
+
+class MisfitProfile(MisfitObject): pass
+
+
+class MisfitDevice(MisfitObject): pass
+
+
+class MisfitGoal(MisfitObject): pass
+
+
+class MisfitSummary(MisfitObject): pass
+
+
+class MisfitSession(MisfitObject): pass
+
+
+class MisfitSleepDetail(MisfitObject): pass
+
+
+class MisfitSleep(MisfitObject):
+    def __init__(self, data):
+        super(MisfitSleep, self).__init__(data)
+        sleep_details = []
+        for sleep_detail in self.sleepDetails:
+            sleep_details.append(MisfitSleepDetail(sleep_detail))
+        self.sleepDetails = sleep_details

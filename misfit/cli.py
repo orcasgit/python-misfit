@@ -27,6 +27,7 @@ Options:
 from __future__ import absolute_import
 
 from docopt import docopt
+from pprint import PrettyPrinter
 
 from . import __version__
 from .auth import MisfitAuth
@@ -96,17 +97,22 @@ class MisfitCli:
                         user_id)
 
         if arguments['profile']:
-            print(misfit.profile(object_id))
+            result = misfit.profile(object_id)
         elif arguments['device']:
-            print(misfit.device(object_id))
+            result = misfit.device(object_id)
         elif arguments['goal']:
-            print(misfit.goal(start_date, end_date, object_id))
+            result = misfit.goal(start_date, end_date, object_id)
         elif arguments['summary']:
-            print(misfit.summary(start_date, end_date, detail, object_id))
+            result = misfit.summary(start_date, end_date, detail, object_id)
         elif arguments['session']:
-            print(misfit.session(start_date, end_date, object_id))
+            result = misfit.session(start_date, end_date, object_id)
         elif arguments['sleep']:
-            print(misfit.sleep(start_date, end_date, object_id))
+            result = misfit.sleep(start_date, end_date, object_id)
+        pp = PrettyPrinter(indent=4)
+        if isinstance(result, list):
+            pp.pprint([res.data for res in result])
+        else:
+            pp.pprint(result.data)
 
     def authorize(self):
         """
