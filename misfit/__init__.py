@@ -1,6 +1,8 @@
 from misfit import *
 
-__all__ = ["API_URL", "Misfit"]
+__all__ = ['API_URL', 'Misfit', 'MisfitProfile', 'MisfitDevice', 'MisfitGoal',
+           'MisfitSummary', 'MisfitSession', 'MisfitSleepDetail',
+           'MisfitSleep']
 __title__ = 'misfit'
 __author__ = 'ORCAS'
 __author_email__ = 'bpitcher@orcasinc.com'
