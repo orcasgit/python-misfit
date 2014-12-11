@@ -27,7 +27,6 @@ class MisfitException(Exception):
             elif 'error_code' in json_content:
                 code = json_content['error_code']
 
-
         if code == 404:
             raise MisfitNotFoundError(code, message)
         elif code == 400:
@@ -42,19 +41,25 @@ class MisfitException(Exception):
             raise MisfitUnknownError(code, message)
 
 
-class MisfitNotFoundError(MisfitException): pass
+class MisfitNotFoundError(MisfitException):
+    pass
 
 
-class MisfitBadRequest(MisfitException): pass
+class MisfitBadRequest(MisfitException):
+    pass
 
 
-class MisfitBadGateway(MisfitException): pass
+class MisfitBadGateway(MisfitException):
+    pass
 
 
-class MisfitUnauthorized(MisfitException): pass
+class MisfitUnauthorized(MisfitException):
+    pass
 
 
-class MisfitForbidden(MisfitException): pass
+class MisfitForbidden(MisfitException):
+    pass
 
 
-class MisfitUnknownError(MisfitException): pass
+class MisfitUnknownError(MisfitException):
+    pass
