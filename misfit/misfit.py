@@ -5,7 +5,9 @@ import sys
 
 from oauthlib.oauth2 import Client
 from requests_oauthlib import OAuth2
+from slumber.exceptions import HttpClientError, HttpServerError
 
+from .exceptions import MisfitException
 
 API_URL = 'https://api.misfitwearables.com/'
 
@@ -53,8 +55,11 @@ class Misfit:
         return [MisfitSleep(sleep) for sleep in sleeps]
 
     def _get_object(self, api_section, object_id=None, **kwargs):
-        args = (object_id,) if object_id else tuple()
-        return api_section(*args).get(**kwargs)
+        try:
+            args = (object_id,) if object_id else tuple()
+            return api_section(*args).get(**kwargs)
+        except (HttpClientError, HttpServerError):
+            MisfitException.build_exception(sys.exc_info()[1])
 
 
 class UnicodeMixin(object):
