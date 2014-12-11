@@ -1,4 +1,14 @@
-from misfit import *
+from .misfit import (
+    API_URL,
+    Misfit,
+    MisfitProfile,
+    MisfitDevice,
+    MisfitGoal,
+    MisfitSummary,
+    MisfitSession,
+    MisfitSleepDetail,
+    MisfitSleep
+)
 
 __all__ = ['API_URL', 'Misfit', 'MisfitProfile', 'MisfitDevice', 'MisfitGoal',
            'MisfitSummary', 'MisfitSession', 'MisfitSleepDetail',

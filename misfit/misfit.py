@@ -6,10 +6,17 @@ import sys
 from oauthlib.oauth2 import Client
 from requests_oauthlib import OAuth2
 from slumber.exceptions import HttpClientError, HttpServerError
+from slumber.serialize import Serializer, JsonSerializer
 
 from .exceptions import MisfitException
 
 API_URL = 'https://api.misfitwearables.com/'
+
+
+class MisfitSerializer(JsonSerializer):
+    """ Override the built-in JSON serializer to handle bytes """
+    def loads(self, data):
+        return json.loads(data.decode('utf8'))
 
 
 class Misfit:
@@ -17,8 +24,9 @@ class Misfit:
         auth = OAuth2(client_id, Client(client_id),
                       {'access_token': access_token})
         user = user_id if user_id else 'me'
-        self.api = slumber.API('%smove/resource/v1/user/%s/' %
-                               (API_URL, user), auth=auth)
+        s = Serializer(default="json", serializers=[MisfitSerializer()])
+        self.api = slumber.API('%smove/resource/v1/user/%s/' % (API_URL, user),
+                               auth=auth, serializer=s)
 
     def profile(self, object_id=None):
         return MisfitProfile(self._get_object(self.api.profile, object_id))
