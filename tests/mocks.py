@@ -1,3 +1,5 @@
+import json
+
 from httmock import urlmatch
 
 
@@ -11,29 +13,29 @@ def not_found(*args):
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def invalid_parameters(*args):
     """ Mock requests to Misfit with invalid parameters """
-    return {'status_code': 400,
-            'content': "{'error_message': 'Invalid parameters'}"}
+    json_content = {'error_message': 'Invalid parameters'}
+    return {'status_code': 400, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def bad_gateway(*args):
     """ Mock requests to Misfit with Bad Gateway error """
-    return {'status_code': 502,
-            'content': "{'error_code': 502, 'error_message': 'Bad Gateway'}"}
+    json_content = {'error_code': 502, 'error_message': 'Bad Gateway'}
+    return {'status_code': 502, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def unauthorized(*args):
     """ Mock requests to Misfit with Unauthorized error """
-    return {'status_code': 401,
-            'content': "{'code': 401, 'message': 'Invalid Access Token'}"}
+    json_content = {'code': 401, 'message': 'Invalid Access Token'}
+    return {'status_code': 401, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def forbidden(*args):
     """ Mock requests to Misfit with Forbidden error """
-    return {'status_code': 403,
-            'content': "{'error_code': 403, 'error_message': 'Forbidden'}"}
+    json_content = {'error_code': 403, 'error_message': 'Forbidden'}
+    return {'status_code': 403, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
