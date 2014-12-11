@@ -57,7 +57,7 @@ needed for further API calls: ::
 Requirements
 ============
 
-* Python 2.6+ < 3
+* Python 2.6+ (Including 3.x)
 * slumber
 * docopt
 * cherryPy
