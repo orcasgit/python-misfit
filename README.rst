@@ -18,7 +18,7 @@ Quick Start
 
 Install with :code:`pip install misfit`
 
-[Create an app](https://build.misfit.com/apps) with "Application Domain" set to
+`Create an app <https://build.misfit.com/apps>`_ with "Application Domain" set to
 http://127.0.0.1:8080/. Now use the "App key" and "App secret" in the following
 command: ::
     misfit authorize --client_id=<app_key> --client_secret=<app_secret>
@@ -26,7 +26,7 @@ command: ::
 That will save the necessary credentials for making further API calls to a file
 called "misfit.cfg". These credentials should be kept private. You can use same
 the command-line client to access everything in the
-[Resource API](https://build.misfit.com/docs/resource). You can also access the
+`Resource API <https://build.misfit.com/docs/resource>`_. You can also access the
 same resources using the Python API: ::
     >>> from misfit import Misfit
     >>> misfit = Misfit(<client_id>, <client_secret>, <access_token>)
@@ -36,7 +36,7 @@ same resources using the Python API: ::
 Slow Start
 ==========
 
-After you have installed and `created your misfit app<https://build.misfit.com/apps>`_
+After you have installed and `created your misfit app <https://build.misfit.com/apps>`_
 you can authorize and use the API with your own web server rather than the
 built-in CherryPy server like so: ::
     >>> from misfit.auth import MisfitAuth
