@@ -12,41 +12,54 @@ def not_found(*args):
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def invalid_parameters(*args):
-    """ Mock requests to Misfit with invalid parameters """
+    """ Mock requests to Misfit with invalid parameters: 400 """
     json_content = {'error_message': 'Invalid parameters'}
     return {'status_code': 400, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def bad_gateway(*args):
-    """ Mock requests to Misfit with Bad Gateway error """
+    """ Mock requests to Misfit with Bad Gateway error: 502 """
     json_content = {'error_code': 502, 'error_message': 'Bad Gateway'}
     return {'status_code': 502, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def unauthorized(*args):
-    """ Mock requests to Misfit with Unauthorized error """
+    """ Mock requests to Misfit with Unauthorized error: 401 """
     json_content = {'code': 401, 'message': 'Invalid Access Token'}
     return {'status_code': 401, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def forbidden(*args):
-    """ Mock requests to Misfit with Forbidden error """
+    """ Mock requests to Misfit with Forbidden error: 403 """
     json_content = {'error_code': 403, 'error_message': 'Forbidden'}
     return {'status_code': 403, 'content': json.dumps(json_content)}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
+def rate_limit(*args):
+    """ Mock requests to Misfit with rate limit error: 429 """
+    headers = {
+        'x-ratelimit-limit': '150',
+        'x-ratelimit-remaining': '148',
+        'x-ratelimit-reset': '1418424178'
+    }
+    json_content = {'error_code': 429, 'error_message': 'Rate limit exceeded'}
+    return {'status_code': 429, 'content': json.dumps(json_content),
+            'headers': headers}
+
+
+@urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def unknown_error1(*args):
-    """ Mock requests to Misfit with Unknown error 1 """
+    """ Mock requests to Misfit with Unknown error 1: 500 """
     return {'status_code': 500, 'content': "I HAVE NO IDEA WHAT'S GOING ON!"}
 
 
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def unknown_error2(*args):
-    """ Mock requests to Misfit with Unknown error 2 """
+    """ Mock requests to Misfit with Unknown error 2: 500 """
     return {'status_code': 500, 'content': "{}"}
 
 

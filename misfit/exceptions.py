@@ -6,9 +6,23 @@ class MisfitException(Exception):
 
 
 class MisfitHttpException(MisfitException):
-    def __init__(self, code, message):
+    """
+    Base class for all HTTP exceptions raised by the Misfit API. All exceptions
+    will have three attributes.
+
+    - code: The status code of the HTTP response, defaults to 500
+    - message: The messages returned from the Misfit API
+    - response: If we have one, this attribute will be the response object, of
+      type :code:`requests.models.Response`. It's useful to have access to this
+      because each response contains useful headers. For example, if the
+      library throws an exception of type :code:`MisfitRateLimitError` you can
+      retrieve a time stamp for when the rate limit resets with the following
+      code: :code:`exc.response.headers['x-ratelimit-reset']`
+    """
+    def __init__(self, code, message, response=None):
         self.code = code
         self.message = message
+        self.response = response
         super(MisfitHttpException, self).__init__(self, message)
 
     @staticmethod
@@ -31,18 +45,16 @@ class MisfitHttpException(MisfitException):
             elif 'error_code' in json_content:
                 code = json_content['error_code']
 
-        if code == 404:
-            raise MisfitNotFoundError(code, message)
-        elif code == 400:
-            raise MisfitBadRequest(code, message)
-        elif code == 502:
-            raise MisfitBadGateway(code, message)
-        elif code == 401:
-            raise MisfitUnauthorized(code, message)
-        elif code == 403:
-            raise MisfitForbidden(code, message)
-        else:
-            raise MisfitUnknownError(code, message)
+        exceptions = {
+            400: MisfitBadRequest,
+            401: MisfitUnauthorized,
+            403: MisfitForbidden,
+            404: MisfitNotFoundError,
+            429: MisfitRateLimitError,
+            500: MisfitUnknownError,
+            502: MisfitBadGateway
+        }
+        raise exceptions[code](code, message, getattr(exc, 'response', None))
 
 
 class MisfitNotFoundError(MisfitHttpException):
@@ -62,6 +74,10 @@ class MisfitUnauthorized(MisfitHttpException):
 
 
 class MisfitForbidden(MisfitHttpException):
+    pass
+
+
+class MisfitRateLimitError(MisfitHttpException):
     pass
 
 
