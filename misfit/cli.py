@@ -3,12 +3,12 @@
 
 Usage:
   misfit authorize --client_id=<client_id> --client_secret=<client_secret> [--config=<config_file>]
-  misfit profile [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
-  misfit device [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
-  misfit goal --start_date=<start_date> --end_date=<end_date> [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
-  misfit summary --start_date=<start_date> --end_date=<end_date> [--detail] [--config=<config_file>] [--user_id=<user_id>]
-  misfit session --start_date=<start_date> --end_date=<end_date> [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
-  misfit sleep --start_date=<start_date> --end_date=<end_date> [--config=<config_file>] [--user_id=<user_id>] [--object_id=<object_id>]
+  misfit profile [--user_id=<user_id>] [--object_id=<object_id>] [--config=<config_file>]
+  misfit device [--user_id=<user_id>] [--object_id=<object_id>] [--config=<config_file>]
+  misfit goal (--start_date=<start_date> --end_date=<end_date>|--object_id=<object_id>) [--user_id=<user_id>] [--config=<config_file>]
+  misfit summary --start_date=<start_date> --end_date=<end_date> [--detail] [--user_id=<user_id>] [--config=<config_file>]
+  misfit session (--start_date=<start_date> --end_date=<end_date>|--object_id=<object_id>) [--user_id=<user_id>] [--config=<config_file>]
+  misfit sleep (--start_date=<start_date> --end_date=<end_date>|--object_id=<object_id>) [--user_id=<user_id>] [--config=<config_file>]
   misfit --version
 
 Options:

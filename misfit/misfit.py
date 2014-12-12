@@ -8,7 +8,7 @@ from requests_oauthlib import OAuth2
 from slumber.exceptions import HttpClientError, HttpServerError
 from slumber.serialize import Serializer, JsonSerializer
 
-from .exceptions import MisfitException
+from .exceptions import MisfitException, MisfitHttpException
 
 API_URL = 'https://api.misfitwearables.com/'
 
@@ -34,40 +34,52 @@ class Misfit:
     def device(self, object_id=None):
         return MisfitDevice(self._get_object(self.api.device, object_id))
 
-    def goal(self, start_date, end_date, object_id=None):
+    def goal(self, start_date=None, end_date=None, object_id=None):
+        self._check_date_range_or_id(start_date, end_date, object_id)
         goals = self._get_object(
             self.api.activity.goals, object_id,
-            start_date=start_date, end_date=end_date)['goals']
-        return [MisfitGoal(goal) for goal in goals]
+            start_date=start_date, end_date=end_date)
+        if 'goals' in goals:
+            return [MisfitGoal(goal) for goal in goals['goals']]
+        return MisfitGoal(goals)
 
-    def summary(self, start_date, end_date, detail=False, object_id=None):
+    def summary(self, start_date, end_date, detail=False):
         summary = self._get_object(
-            self.api.activity.summary, object_id,
-            start_date=start_date, end_date=end_date,
-            detail='true' if detail else 'false')
+            self.api.activity.summary, start_date=start_date,
+            end_date=end_date, detail='true' if detail else 'false')
         if 'summary' in summary:
             return [MisfitSummary(summ) for summ in summary['summary']]
-        else:
-            return MisfitSummary(summary)
+        return MisfitSummary(summary)
 
-    def session(self, start_date, end_date, object_id=None):
+    def session(self, start_date=None, end_date=None, object_id=None):
+        self._check_date_range_or_id(start_date, end_date, object_id)
         sessions = self._get_object(
             self.api.activity.sessions, object_id,
-            start_date=start_date, end_date=end_date)['sessions']
-        return [MisfitSession(session) for session in sessions]
+            start_date=start_date, end_date=end_date)
+        if 'session' in sessions:
+            return [MisfitSession(session) for session in sessions['sessions']]
+        return MisfitSession(sessions)
 
-    def sleep(self, start_date, end_date, object_id=None):
+    def sleep(self, start_date=None, end_date=None, object_id=None):
+        self._check_date_range_or_id(start_date, end_date, object_id)
         sleeps = self._get_object(
             self.api.activity.sleeps, object_id,
-            start_date=start_date, end_date=end_date)['sleeps']
-        return [MisfitSleep(sleep) for sleep in sleeps]
+            start_date=start_date, end_date=end_date)
+        if 'sleeps' in sleeps:
+            return [MisfitSleep(sleep) for sleep in sleeps['sleeps']]
+        return MisfitSleep(sleeps)
+
+    def _check_date_range_or_id(self, start_date, end_date, object_id):
+        if (start_date is None or end_date is None) and object_id is None:
+            raise MisfitException(
+                'Either a date range or object id must be supplied')
 
     def _get_object(self, api_section, object_id=None, **kwargs):
         try:
             args = (object_id,) if object_id else tuple()
             return api_section(*args).get(**kwargs)
         except (HttpClientError, HttpServerError):
-            MisfitException.build_exception(sys.exc_info()[1])
+            MisfitHttpException.build_exception(sys.exc_info()[1])
 
 
 class UnicodeMixin(object):

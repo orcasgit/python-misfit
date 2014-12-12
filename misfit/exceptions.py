@@ -2,10 +2,14 @@ import json
 
 
 class MisfitException(Exception):
+    pass
+
+
+class MisfitHttpException(MisfitException):
     def __init__(self, code, message):
         self.code = code
         self.message = message
-        super(MisfitException, self).__init__(self, message)
+        super(MisfitHttpException, self).__init__(self, message)
 
     @staticmethod
     def build_exception(exc):
@@ -41,25 +45,25 @@ class MisfitException(Exception):
             raise MisfitUnknownError(code, message)
 
 
-class MisfitNotFoundError(MisfitException):
+class MisfitNotFoundError(MisfitHttpException):
     pass
 
 
-class MisfitBadRequest(MisfitException):
+class MisfitBadRequest(MisfitHttpException):
     pass
 
 
-class MisfitBadGateway(MisfitException):
+class MisfitBadGateway(MisfitHttpException):
     pass
 
 
-class MisfitUnauthorized(MisfitException):
+class MisfitUnauthorized(MisfitHttpException):
     pass
 
 
-class MisfitForbidden(MisfitException):
+class MisfitForbidden(MisfitHttpException):
     pass
 
 
-class MisfitUnknownError(MisfitException):
+class MisfitUnknownError(MisfitHttpException):
     pass
