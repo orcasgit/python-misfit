@@ -126,7 +126,10 @@ class MisfitCli:
         auth.browser_authorize()
 
         # Write the authentication information to a config file for later use
-        self.write_config(auth.token['access_token'])
+        if auth.token:
+            self.write_config(auth.token['access_token'])
+        else:
+            print('ERROR: We were unable to authorize to use the Misfit API.')
 
 
 def main():

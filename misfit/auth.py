@@ -15,14 +15,18 @@ from .misfit import API_URL
 class MisfitAuth:
     def __init__(self, client_id, client_secret,
                  redirect_uri='http://127.0.0.1:8080/', state=None,
-                 scope=['public', 'birthday', 'email'], html=None):
+                 scope=['public', 'birthday', 'email'], success_html=None,
+                 failure_html=None):
         """ Initialize the OAuth2Session """
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.scope = scope
-        self.html = html if html else """
+        self.success_html = success_html if success_html else """
             <h1>You are now authorized to access the Misfit API!</h1>
+            <br/><h3>You can close this window</h3>"""
+        self.failure_html = failure_html if failure_html else """
+            <h1>ERROR: We were unable to authorize to use the Misfit API.</h1>
             <br/><h3>You can close this window</h3>"""
         # Ignore when the Misfit API doesn't return the actual scope granted,
         # even though this goes against rfc6749:
@@ -50,6 +54,7 @@ class MisfitAuth:
         access_token.
         """
         if self.state != state:
+            self._shutdown_cherrypy()
             raise MismatchingStateError()
         self.token = self.oauth.fetch_token(
             '%sauth/tokens/exchange/' % API_URL, code=code,
@@ -65,11 +70,16 @@ class MisfitAuth:
         cherrypy.quickstart(self)
 
     @cherrypy.expose
-    def index(self, code, state):
+    def index(self, state, code=None, error=None):
         """
         Receive a Misfit response containing a verification code. Use the code
         to fetch the access_token.
         """
-        self.fetch_token(code, state)
-        threading.Timer(1, lambda: cherrypy.engine.exit()).start()
-        return self.html
+        if code:
+            self.fetch_token(code, state)
+        self._shutdown_cherrypy()
+        return self.success_html if code else self.failure_html
+
+    def _shutdown_cherrypy(self):
+        if cherrypy.engine.state == cherrypy.engine.states.STARTED:
+            threading.Timer(1, lambda: cherrypy.engine.exit()).start()
