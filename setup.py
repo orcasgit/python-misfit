@@ -26,7 +26,7 @@ setup(
     install_requires=["setuptools"] + required,
     # When https://github.com/pyca/cryptography/pull/1499 has made it into a
     # release, we can switch to use that release
-    dependency_links=['https://github.com/reaperhulk/cryptography/archive/1b331d200124325864b23ec27c4059ba84fd68c0.zip#egg=cryptography-0.7.dev1'],
+    dependency_links=['https://github.com/orcasgit/cryptography/archive/x509-ossl-impl.zip#egg=cryptography-0.7.dev1'],
     license=refind('__license__'),
     entry_points={
         'console_scripts': ['misfit=misfit.cli:main'],
