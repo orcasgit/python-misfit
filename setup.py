@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import multiprocessing
 import re
 
 from setuptools import setup
