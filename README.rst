@@ -78,7 +78,7 @@ looking at the :code:`Type` attribute, which will be either
 :code:`Notification` message, you will find the updates as a list in a
 :code:`Message` attribute. After you process the updates (which can take no
 longer than
-`15 seconds<http://docs.aws.amazon.com/sns/latest/dg/DeliveryPolicies.html>`)
+`15 seconds <http://docs.aws.amazon.com/sns/latest/dg/DeliveryPolicies.html>`_)
 make sure to respond with an HTTP status of 200, otherwise SNS may try to
 deliver it again. A full workflow should look something like this: ::
     >>> from misfit.notification import MisfitNotification
@@ -91,10 +91,10 @@ deliver it again. A full workflow should look something like this: ::
     >>> # Give an empty response with a 200 status code
 
 Once you have your endpoint up and running, go to your
-`app<https://build.misfit.com/apps/>` and add your endpoint as a subscription
+`app <https://build.misfit.com/apps/>`_ and add your endpoint as a subscription
 hook URL, making sure the format is json. Click "Test Endpoint" and if all goes
 well, the verification should seamlessly take place. If not, please
-`file an issue<https://github.com/orcasgit/python-misfit/issues>` and we will
+`file an issue <https://github.com/orcasgit/python-misfit/issues>`_ and we will
 try and help you debug. Now switch on all the resources you would like to
 receive and click "Update". Soon you will be receiving Misfit notifications!
 
