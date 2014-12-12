@@ -44,7 +44,6 @@ class MisfitCli:
         """
         Runs the command specified as an argument with the options specified
         """
-
         self.config_file = arguments['--config']
         self.config = configparser.ConfigParser()
         self.client_id = None
@@ -55,7 +54,7 @@ class MisfitCli:
             self.client_id = arguments['--client_id']
             self.client_secret = arguments['--client_secret']
             self.authorize()
-        else:
+        elif not arguments['--version']:
             try:
                 # Fail if config file doesn't exist or is missing information
                 self.read_config()
