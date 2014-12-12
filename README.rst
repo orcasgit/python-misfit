@@ -101,7 +101,7 @@ receive and click "Update". Soon you will be receiving Misfit notifications!
 Requirements
 ============
 
-* Python 2.6+,<3.x
+* Python 2.6+ (Including 3.x)
 * slumber
 * docopt
 * cherryPy
