@@ -54,11 +54,57 @@ needed for further API calls: ::
     >>> print(misfit.profile())
     {u'gender': u'male', u'birthday': u'1981-07-18', u'userId': u'scrubbed', u'name': u'Brad Pitcher'}
 
+Notifications
+=============
+
+This library also includes some basic tools to ease notification handling. To
+use Misfit's Notification API with your web application, the first thing you
+need to do is set up an endpoint to accept POST requests on the domain you
+specified when you created your app, like
+:code:`http://example.com/misfit/notification/` if your application domain is
+:code:`http://example.com`.
+
+Now, when you handle the request, just create a :code:`MisfitNotification`
+object with the body of the request as an argument. The
+:code:`MisfitNotification` constructor automatically verifies the signature of
+the SNS message so you can feel secure in the knowledge that the message is
+legitimate. It will raise :code:`cryptography.exceptions.InvalidSignature` if
+the signature is not valid.
+
+The :code:`MisfitNotification` class handles both subscription confirmation
+messages and regular update messages. You can check the type of message by
+looking at the :code:`Type` attribute, which will be either
+:code:`'SubscriptionConfirmation'` or :code:`'Notification'`. For a
+:code:`Notification` message, you will find the updates as a list in a
+:code:`Message` attribute. After you process the updates (which can take no
+longer than
+`15 seconds<http://docs.aws.amazon.com/sns/latest/dg/DeliveryPolicies.html>`)
+make sure to respond with an HTTP status of 200, otherwise SNS may try to
+deliver it again. A full workflow should look something like this: ::
+    >>> from misfit.notification import MisfitNotification
+    >>> notification = MisfitNotification(content)
+    >>> if notification.Type == 'Notification':
+    >>>    for message in notification.Message:
+    >>>        if message['type'] == 'goals':
+    >>>            # Handle goal update
+    >>>        # Handle other message types
+    >>> # Give an empty response with a 200 status code
+
+Once you have your endpoint up and running, go to your
+`app<https://build.misfit.com/apps/>` and add your endpoint as a subscription
+hook URL, making sure the format is json. Click "Test Endpoint" and if all goes
+well, the verification should seamlessly take place. If not, please
+`file an issue<https://github.com/orcasgit/python-misfit/issues>` and we will
+try and help you debug. Now switch on all the resources you would like to
+receive and click "Update". Soon you will be receiving Misfit notifications!
+
 Requirements
 ============
 
-* Python 2.6+ (Including 3.x)
+* Python 2.6+,<3.x
 * slumber
 * docopt
 * cherryPy
 * requests-oauthlib
+* arrow
+* cryptography

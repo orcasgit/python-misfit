@@ -48,3 +48,17 @@ def unknown_error1(*args):
 def unknown_error2(*args):
     """ Mock requests to Misfit with Unknown error 2 """
     return {'status_code': 500, 'content': "{}"}
+
+
+@urlmatch(scheme='https', netloc='sns.us-east-1.amazonaws.com')
+def sns_certificate(*args):
+    """ Mock requests to retrieve the SNS signing certificate """
+    with open('tests/files/certificate.pem') as cert_file:
+        cert = cert_file.read()
+    return cert
+
+
+@urlmatch(scheme='https', netloc='example-subscribe-url.com')
+def sns_subscribe(*args):
+    """ Mock requests to the SNS SubscribeURL """
+    return ''
