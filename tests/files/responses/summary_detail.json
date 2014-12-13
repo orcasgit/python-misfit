@@ -1,0 +1,28 @@
+{
+    "summary": [
+        {
+            "date": "2014-10-05",
+            "points": 394.4,
+            "steps": 3650,
+            "calories": 1687.4735,
+            "activityCalories": 412.3124,
+            "distance": 1.18
+        },
+        {
+            "date": "2014-10-06",
+            "points": 459.6,
+            "steps": 4330,
+            "calories": 1707.8484,
+            "activityCalories": 412.3124,
+            "distance": 1.3982
+        },
+        {
+            "date": "2014-10-07",
+            "points": 430.4,
+            "steps": 4022,
+            "calories": 1698.7234,
+            "activityCalories": 412.3124,
+            "distance": 1.2988
+        }
+    ]
+}

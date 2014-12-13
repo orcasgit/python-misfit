@@ -111,7 +111,16 @@ class MisfitProfile(MisfitObject): pass
 class MisfitDevice(MisfitObject): pass
 
 
-class MisfitGoal(MisfitObject): pass
+class MisfitGoal(MisfitObject):
+    def percent_complete(self):
+        """
+        Using the number of points received, and comparing to the target
+        points, return the percent complete (from 0-100). Returns
+        :code:`None` if the target is 0.
+        """
+        if self.targetPoints == 0:
+            return None
+        return float(self.points) / self.targetPoints * 100
 
 
 class MisfitSummary(MisfitObject): pass

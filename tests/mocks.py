@@ -3,6 +3,23 @@ import json
 from httmock import urlmatch
 
 
+class MisfitHttMock:
+    def __init__(self, file_name_base):
+        """ Build the response template """
+        self.headers = {'content-type': 'application/json; charset=utf-8'}
+        self.response_tmpl = {'status_code': 200, 'headers': self.headers}
+        self.file_name_base = file_name_base
+
+    @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
+    def json_http(self, *args):
+        """ Generic method to return the contents of a json file """
+        response = self.response_tmpl
+        file_path = 'tests/files/responses/%s.json' % self.file_name_base
+        with open(file_path) as json_file:
+            response['content'] = json_file.read().encode('utf8')
+        return response
+
+
 @urlmatch(scheme='https', netloc=r'api\.misfitwearables\.com')
 def not_found(*args):
     """ Mock requests to Misfit with 404 """
