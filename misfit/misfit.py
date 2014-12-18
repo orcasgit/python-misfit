@@ -56,7 +56,7 @@ class Misfit:
         sessions = self._get_object(
             self.api.activity.sessions, object_id,
             start_date=start_date, end_date=end_date)
-        if 'session' in sessions:
+        if 'sessions' in sessions:
             return [MisfitSession(session) for session in sessions['sessions']]
         return MisfitSession(sessions)
 
