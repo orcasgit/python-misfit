@@ -16,11 +16,12 @@ Misfit API Python Client Implementation
 Quick Start
 ===========
 
-Install with :code:`pip install misfit`
+Install with ``pip install misfit``
 
 `Create an app <https://build.misfit.com/apps>`_ with "Application Domain" set to
 http://127.0.0.1:8080/. Now use the "App key" and "App secret" in the following
 command: ::
+
     misfit authorize --client_id=<app_key> --client_secret=<app_secret>
 
 That will save the necessary credentials for making further API calls to a file
@@ -28,6 +29,7 @@ called "misfit.cfg". These credentials should be kept private. You can use same
 the command-line client to access everything in the
 `Resource API <https://build.misfit.com/docs/resource>`_. You can also access the
 same resources using the Python API: ::
+
     >>> from misfit import Misfit
     >>> misfit = Misfit(<client_id>, <client_secret>, <access_token>)
     >>> print(misfit.profile())
@@ -39,15 +41,17 @@ Slow Start
 After you have installed and `created your misfit app <https://build.misfit.com/apps>`_
 you can authorize and use the API with your own web server rather than the
 built-in CherryPy server like so: ::
+
     >>> from misfit.auth import MisfitAuth
     >>> auth = MisfitAuth(<client_id>, <client_secret>, redirect_uri=<redirect_uri>)
     >>> auth_url = auth.authorize_url()
 
-Now redirect the user to :code:`auth_url`. When control returns to your web
-server at the endpoint specified in :code:`<redirect_uri>`, you will receive
-:code:`code` and :code:`state` GET params you can pass to the
-:code:`fetch_token` method, which will return :code:`access_token`, which is
+Now redirect the user to ``auth_url``. When control returns to your web
+server at the endpoint specified in ``<redirect_uri>``, you will receive
+``code`` and ``state`` GET params you can pass to the
+``fetch_token`` method, which will return ``access_token``, which is
 needed for further API calls: ::
+
     >>> access_token = auth.fetch_token(<code>, <state>)
     >>> from misfit import Misfit
     >>> misfit = Misfit(<client_id>, <client_secret>, <access_token>)
@@ -61,26 +65,27 @@ This library also includes some basic tools to ease notification handling. To
 use Misfit's Notification API with your web application, the first thing you
 need to do is set up an endpoint to accept POST requests on the domain you
 specified when you created your app, like
-:code:`http://example.com/misfit/notification/` if your application domain is
-:code:`http://example.com`.
+``http://example.com/misfit/notification/`` if your application domain is
+``http://example.com``.
 
-Now, when you handle the request, just create a :code:`MisfitNotification`
+Now, when you handle the request, just create a ``MisfitNotification``
 object with the body of the request as an argument. The
-:code:`MisfitNotification` constructor automatically verifies the signature of
+``MisfitNotification`` constructor automatically verifies the signature of
 the SNS message so you can feel secure in the knowledge that the message is
-legitimate. It will raise :code:`cryptography.exceptions.InvalidSignature` if
+legitimate. It will raise ``cryptography.exceptions.InvalidSignature`` if
 the signature is not valid.
 
-The :code:`MisfitNotification` class handles both subscription confirmation
+The ``MisfitNotification`` class handles both subscription confirmation
 messages and regular update messages. You can check the type of message by
-looking at the :code:`Type` attribute, which will be either
-:code:`'SubscriptionConfirmation'` or :code:`'Notification'`. For a
-:code:`Notification` message, you will find the updates as a list in a
-:code:`Message` attribute. After you process the updates (which can take no
+looking at the ``Type`` attribute, which will be either
+``'SubscriptionConfirmation'`` or ``'Notification'``. For a
+``Notification`` message, you will find the updates as a list in a
+``Message`` attribute. After you process the updates (which can take no
 longer than
 `15 seconds <http://docs.aws.amazon.com/sns/latest/dg/DeliveryPolicies.html>`_)
 make sure to respond with an HTTP status of 200, otherwise SNS may try to
 deliver it again. A full workflow should look something like this: ::
+
     >>> from misfit.notification import MisfitNotification
     >>> notification = MisfitNotification(content)
     >>> if notification.Type == 'Notification':
@@ -101,10 +106,4 @@ receive and click "Update". Soon you will be receiving Misfit notifications!
 Requirements
 ============
 
-* Python 2.6+ (Including 3.x)
-* slumber
-* docopt
-* cherryPy
-* requests-oauthlib
-* arrow
-* cryptography
+* Python 2.6+, 3.2+ and PyPy
