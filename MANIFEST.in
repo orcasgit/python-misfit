@@ -1,1 +1,1 @@
-include LICENSE AUTHORS README.rst requirements/*
+include LICENSE AUTHORS CHANGELOG.rst README.rst requirements/*
