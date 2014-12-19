@@ -54,8 +54,9 @@ class TestMisfitAPI(unittest.TestCase):
                 start_date=summ_dict['date'], end_date=end_date, detail=True)
         eq_(len(summary_list), 3)
         summary = summary_list[0]
-        eq_(summary.date, arrow.get(summ_dict['date']))
         eq_(summary_list[2].date, arrow.get(end_date))
+        eq_(summary.data, summ_dict)
+        eq_(summary.date, arrow.get(summ_dict['date']))
         eq_(summary.points, summ_dict['points'])
         eq_(summary.steps, summ_dict['steps'])
         eq_(summary.calories, summ_dict['calories'])

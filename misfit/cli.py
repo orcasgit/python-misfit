@@ -102,7 +102,7 @@ class MisfitCli:
         elif arguments['goal']:
             result = misfit.goal(start_date, end_date, object_id)
         elif arguments['summary']:
-            result = misfit.summary(start_date, end_date, detail, object_id)
+            result = misfit.summary(start_date, end_date, detail)
         elif arguments['session']:
             result = misfit.session(start_date, end_date, object_id)
         elif arguments['sleep']:
