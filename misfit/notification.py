@@ -13,8 +13,8 @@ from .misfit import MisfitObject
 def string_to_sign(data):
     """ Build a signed SNS string from a dict """
     strings = []
-    keys = ('Message', 'MessageId', 'Subject', 'Timestamp', 'TopicArn', 'Type')
-    for key in keys:
+    for key in ('Message', 'MessageId', 'Subject', 'SubscribeURL', 'Timestamp',
+                'Token', 'TopicArn', 'Type'):
         if key in data:
             strings += [key, data[key]]
     strings.append("")
