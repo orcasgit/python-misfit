@@ -1,3 +1,8 @@
+Version 0.1.1 (2014-12-22)
+==========================
+
+* Support for verifying signed SubscriptionConfirmation messages
+
 Version 0.1.0 (2014-12-19)
 ==========================
 
