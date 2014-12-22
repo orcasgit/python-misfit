@@ -1,0 +1,21 @@
+{
+    "goals": [{
+        "id":"51a4189acf12e53f81000001",
+        "date":"2014-10-05",
+        "points":500,
+        "targetPoints":1000,
+        "timeZoneOffset":-8
+    }, {
+        "id":"51a4189acf12e53f81000002",
+        "date":"2014-10-06",
+        "points":600,
+        "targetPoints":1000,
+        "timeZoneOffset":-8
+    }, {
+        "id":"51a4189acf12e53f81000003",
+        "date":"2014-10-07",
+        "points":700,
+        "targetPoints":1000,
+        "timeZoneOffset":-8
+    }]
+}
