@@ -8,7 +8,7 @@ from httmock import HTTMock
 from mock import patch
 from nose.tools import eq_
 from requests import Request
-from six import BytesIO
+from six import StringIO
 
 from misfit.cli import main, MisfitCli
 
@@ -73,7 +73,7 @@ class TestMisfitCli(unittest.TestCase):
         state = 'FAKE_STATE'
         new_state_mock.return_value = state
         stdout_backup = sys.stdout
-        sys.stdout = BytesIO()
+        sys.stdout = StringIO()
 
         # Try without mocking token receipt
         auth_arguments = self.default_arguments.copy()
