@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 import sys
 
@@ -7,6 +8,7 @@ from httmock import HTTMock
 from mock import patch
 from nose.tools import eq_
 from requests import Request
+from six import BytesIO
 
 from misfit.cli import main, MisfitCli
 
@@ -57,6 +59,50 @@ class TestMisfitCli(unittest.TestCase):
         version_arguments = self.default_arguments.copy()
         version_arguments['--version'] = True
         cli_mock.assert_called_once_with(version_arguments)
+
+    @patch('webbrowser.open')
+    @patch('cherrypy.quickstart')
+    @patch('requests_oauthlib.OAuth2Session.new_state')
+    @patch('requests_oauthlib.OAuth2Session.fetch_token')
+    def test_authorize(self, fetch_token_mock, new_state_mock, quickstart_mock,
+                       open_mock):
+        """
+        Test that the authorize CLI command authorizes the user correctly
+        """
+        # Mock the state generation function so we know what it returns
+        state = 'FAKE_STATE'
+        new_state_mock.return_value = state
+        stdout_backup = sys.stdout
+        sys.stdout = BytesIO()
+
+        # Try without mocking token receipt
+        auth_arguments = self.default_arguments.copy()
+        auth_arguments.update({
+            'authorize': True,
+            '--client_id': 'FAKE_CLIENT_ID',
+            '--client_secret': 'FAKE_CLIENT_SECRET'
+        })
+        MisfitCli(auth_arguments)
+        auth_url = 'https://api.misfitwearables.com/auth/dialog/authorize?response_type=code&client_id=FAKE_CLIENT_ID&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2F&scope=public+birthday+email&state=FAKE_STATE'
+        open_mock.assert_called_once_with(auth_url)
+        eq_(sys.stdout.getvalue(),
+            'ERROR: We were unable to authorize to use the Misfit API.\n')
+
+        # This time, make sure we have a token
+        fetch_token_mock.return_value = {'access_token': 'FAKE_TOKEN'}
+        quickstart_mock.side_effect = lambda auth: auth.fetch_token(0, state)
+        auth_arguments['--config'] = './misfit-test.cfg'
+        MisfitCli(auth_arguments)
+        with open(auth_arguments['--config']) as config_file:
+            eq_(config_file.read(),
+                '[misfit]\n'
+                'client_id = FAKE_CLIENT_ID\n'
+                'client_secret = FAKE_CLIENT_SECRET\n'
+                'access_token = FAKE_TOKEN\n\n')
+        os.remove(auth_arguments['--config'])
+
+        sys.stdout = stdout_backup
+
 
     @patch('pprint.PrettyPrinter.pprint')
     def test_summary(self, pprint_mock):
