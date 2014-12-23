@@ -28,15 +28,11 @@ from __future__ import absolute_import
 
 from docopt import docopt
 from pprint import PrettyPrinter
+from six.moves import configparser
 
 from . import __version__
 from .auth import MisfitAuth
 from .misfit import Misfit
-
-try:
-    import configparser
-except ImportError:  # Python 2.x fallback
-    import ConfigParser as configparser
 
 
 class MisfitCli:

@@ -9,6 +9,7 @@ from mock import patch
 from nose.tools import eq_
 from requests import Request
 from six import StringIO
+from six.moves import configparser
 
 from misfit.cli import main, MisfitCli
 
@@ -89,16 +90,22 @@ class TestMisfitCli(unittest.TestCase):
             'ERROR: We were unable to authorize to use the Misfit API.\n')
 
         # This time, make sure we have a token
-        fetch_token_mock.return_value = {'access_token': 'FAKE_TOKEN'}
+        token = {'access_token': 'FAKE_TOKEN'}
+        fetch_token_mock.return_value = token
         quickstart_mock.side_effect = lambda auth: auth.fetch_token(0, state)
         auth_arguments['--config'] = './misfit-test.cfg'
+        # Remove the cfg file if it exists
+        if os.path.isfile(auth_arguments['--config']):
+            os.remove(auth_arguments['--config'])
         MisfitCli(auth_arguments)
-        with open(auth_arguments['--config']) as config_file:
-            eq_(config_file.read(),
-                '[misfit]\n'
-                'client_id = FAKE_CLIENT_ID\n'
-                'client_secret = FAKE_CLIENT_SECRET\n'
-                'access_token = FAKE_TOKEN\n\n')
+        config = configparser.ConfigParser()
+        with open(auth_arguments['--config']) as cfg:
+            config.readfp(cfg)
+        assert config.has_section('misfit')
+        eq_(config.get('misfit', 'client_id'), auth_arguments['--client_id'])
+        eq_(config.get('misfit', 'client_secret'),
+            auth_arguments['--client_secret'])
+        eq_(config.get('misfit', 'access_token'), token['access_token'])
         os.remove(auth_arguments['--config'])
 
         sys.stdout = stdout_backup
