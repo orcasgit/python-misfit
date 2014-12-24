@@ -6,7 +6,7 @@ import sys
 from docopt import DocoptExit
 from httmock import HTTMock
 from mock import patch
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 from requests import Request
 from six import StringIO
 from six.moves import configparser
@@ -97,18 +97,72 @@ class TestMisfitCli(unittest.TestCase):
         # Remove the cfg file if it exists
         if os.path.isfile(auth_arguments['--config']):
             os.remove(auth_arguments['--config'])
-        MisfitCli(auth_arguments)
-        config = configparser.ConfigParser()
-        with open(auth_arguments['--config']) as cfg:
-            config.readfp(cfg)
-        assert config.has_section('misfit')
-        eq_(config.get('misfit', 'client_id'), auth_arguments['--client_id'])
-        eq_(config.get('misfit', 'client_secret'),
-            auth_arguments['--client_secret'])
-        eq_(config.get('misfit', 'access_token'), token['access_token'])
+        cli = MisfitCli(auth_arguments)
+        eq_(cli.client_id, auth_arguments['--client_id'])
+        eq_(cli.client_secret, auth_arguments['--client_secret'])
         os.remove(auth_arguments['--config'])
 
         sys.stdout = stdout_backup
+
+    def test_write_config(self):
+        """
+        Test that the write_config method works as expected
+        """
+        config_arguments = self.default_arguments.copy()
+        config_arguments['--config'] = './misfit-test.cfg'
+        # Remove the cfg file if it exists
+        if os.path.isfile(config_arguments['--config']):
+            os.remove(config_arguments['--config'])
+        # Create an empty MisfitCli
+        cli = MisfitCli(config_arguments)
+        ok_(cli.client_id is None)
+        ok_(cli.client_secret is None)
+        ok_(cli.access_token is None)
+
+        # Manually create the config file
+        test_args = ['FAKE_ID', 'FAKE_SECRET', 'FAKE_TOKEN']
+        cli.client_id = test_args[0]
+        cli.client_secret = test_args[1]
+        # Write the config file
+        cli.write_config(test_args[2])
+        config = configparser.ConfigParser()
+        with open(config_arguments['--config']) as cfg:
+            config.readfp(cfg)
+        ok_(config.has_section('misfit'))
+        eq_(config.get('misfit', 'client_id'), test_args[0])
+        eq_(config.get('misfit', 'client_secret'), test_args[1])
+        eq_(config.get('misfit', 'access_token'), test_args[2])
+        # Remove the test config we created
+        os.remove(config_arguments['--config'])
+
+    def test_read_config(self):
+        """
+        Test that the read_config method pulls values from config
+        """
+        config_arguments = self.default_arguments.copy()
+        config_arguments['--config'] = './misfit-test.cfg'
+        # Remove the cfg file if it exists
+        if os.path.isfile(config_arguments['--config']):
+            os.remove(config_arguments['--config'])
+        # Create an empty MisfitCli
+        cli = MisfitCli(config_arguments)
+        ok_(cli.client_id is None)
+        ok_(cli.client_secret is None)
+        ok_(cli.access_token is None)
+        # Manually create the config file
+        lines = ['[misfit]', 'access_token = FAKE_TOKEN',
+                 'client_secret = FAKE_SECRET', 'client_id = FAKE_ID']
+        with open(config_arguments['--config'], 'w') as cfg:
+            cfg.write('\n'.join(lines))
+        # Readi it in
+        cli.read_config()
+        # Check that the values match the ones we entered
+        eq_(cli.access_token, lines[1].split(' = ')[1])
+        eq_(cli.client_secret, lines[2].split(' = ')[1])
+        eq_(cli.client_id, lines[3].split(' = ')[1])
+        # Remove the test config we created
+        os.remove(config_arguments['--config'])
+
 
 
     @patch('pprint.PrettyPrinter.pprint')
