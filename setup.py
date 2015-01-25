@@ -24,7 +24,7 @@ setup(
     packages=['misfit'],
     package_data={'': ['LICENSE']},
     include_package_data=True,
-    install_requires=["setuptools<8.0"] + required,
+    install_requires=["setuptools"] + required,
     license=refind('__license__'),
     entry_points={
         'console_scripts': ['misfit=misfit.cli:main'],
