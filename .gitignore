@@ -7,3 +7,4 @@ misfit.egg-info
 .tox
 __pycache__
 *.pyc
+*.egg
