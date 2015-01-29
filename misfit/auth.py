@@ -2,11 +2,16 @@ from __future__ import absolute_import
 
 import cherrypy
 import os
+import sys
 import threading
+import traceback
 import webbrowser
 
 from oauthlib.oauth2 import Client
-from oauthlib.oauth2.rfc6749.errors import MismatchingStateError
+from oauthlib.oauth2.rfc6749.errors import (
+    MismatchingStateError,
+    MissingTokenError
+)
 from requests_oauthlib import OAuth2Session
 
 from .misfit import API_URL
@@ -26,8 +31,7 @@ class MisfitAuth:
             <h1>You are now authorized to access the Misfit API!</h1>
             <br/><h3>You can close this window</h3>"""
         self.failure_html = failure_html if failure_html else """
-            <h1>ERROR: We were unable to authorize to use the Misfit API.</h1>
-            <br/><h3>You can close this window</h3>"""
+            <h1>ERROR: %s</h1><br/><h3>You can close this window</h3>%s"""
         # Ignore when the Misfit API doesn't return the actual scope granted,
         # even though this goes against rfc6749:
         #     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth2/rfc6749/parameters.py#L392
@@ -54,7 +58,6 @@ class MisfitAuth:
         access_token.
         """
         if self.state != state:
-            self._shutdown_cherrypy()
             raise MismatchingStateError()
         self.token = self.oauth.fetch_token(
             '%sauth/tokens/exchange/' % API_URL, code=code,
@@ -75,10 +78,25 @@ class MisfitAuth:
         Receive a Misfit response containing a verification code. Use the code
         to fetch the access_token.
         """
+        error = None
         if code:
-            self.fetch_token(code, state)
+            try:
+                self.fetch_token(code, state)
+            except MissingTokenError:
+                error = self._fmt_failure(
+                    'Missing access token parameter.</br>Please check that '
+                    'you are using the correct client_secret')
+            except MismatchingStateError:
+                error = self._fmt_failure('CSRF Warning! Mismatching state')
+        else:
+            error = self._fmt_failure('Unknown error while authenticating')
         self._shutdown_cherrypy()
-        return self.success_html if code else self.failure_html
+        return error if error else self.success_html
+
+    def _fmt_failure(self, message):
+        tb = traceback.format_tb(sys.exc_info()[2])
+        tb_html = '<pre>%s</pre>' % ('\n'.join(tb)) if tb else ''
+        return self.failure_html % (message, tb_html)
 
     def _shutdown_cherrypy(self):
         if cherrypy.engine.state == cherrypy.engine.states.STARTED:

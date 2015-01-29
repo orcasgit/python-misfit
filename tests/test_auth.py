@@ -6,7 +6,10 @@ import os
 import unittest
 
 from mock import patch
-from oauthlib.oauth2.rfc6749.errors import MismatchingStateError
+from oauthlib.oauth2.rfc6749.errors import (
+    MismatchingStateError,
+    MissingTokenError
+)
 from requests_oauthlib import OAuth2Session
 
 from misfit.auth import MisfitAuth
@@ -28,7 +31,7 @@ class TestMisfitAuth(unittest.TestCase):
             'redirect_uri': 'http://www.example.com/misfit-auth/',
             'scope': ['public'],
             'success_html': 'My customized success HTML',
-            'failure_html': 'My customized failure HTML',
+            'failure_html': '%s My customized failure HTML %s',
             'state': self.state
         }
         cherrypy.engine.state = cherrypy.engine.states.STOPPED
@@ -111,11 +114,11 @@ class TestMisfitAuth(unittest.TestCase):
         Test that the index CherryPy endpoint fetches the access_token and then
         shuts down the CherryPy server
         """
-        auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         # Mock the fetch_token function so we don't actually hit the API
         fetch_token_mock.return_value = self.token
         # Mock the state generation function so we know what it returns
         new_state_mock.return_value = self.state
+        auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         auth.authorize_url()
         cherrypy.engine.state = cherrypy.engine.states.STARTED
         self.assertEqual(auth.index(self.state, code=self.code),
@@ -132,7 +135,8 @@ class TestMisfitAuth(unittest.TestCase):
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         auth.authorize_url()
         self.assertEqual(auth.index(self.state, error='access_denied'),
-                         self.kwargs['failure_html'])
+                         self.kwargs['failure_html'] %
+                         ('Unknown error while authenticating', ''))
         assert auth.token is None
         self.assertEqual(fetch_token_mock.call_count, 0)
         timer_mock().start.assert_called_once_with()
@@ -142,10 +146,25 @@ class TestMisfitAuth(unittest.TestCase):
         fetch_token_mock.reset_mock()
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         auth.authorize_url()
-        self.assertRaises(MismatchingStateError,
-                          auth.index, 'BAD_STATE', code=self.code)
+        assert auth.index('BAD_STATE', code=self.code).startswith(
+            self.kwargs['failure_html'] %
+            ('CSRF Warning! Mismatching state', ''))
         assert auth.token is None
         self.assertEqual(fetch_token_mock.call_count, 0)
+        timer_mock().start.assert_called_once_with()
+
+        # Also try with an a bad client_secret
+        timer_mock.reset_mock()
+        fetch_token_mock.reset_mock()
+        fetch_token_mock.side_effect = MissingTokenError
+        auth = MisfitAuth(self.client_id, 'INVALID_SECRET', **self.kwargs)
+        auth.authorize_url()
+        assert auth.index(self.state, code=self.code).startswith(
+            self.kwargs['failure_html'] %
+            ('Missing access token parameter.</br>Please check '
+             'that you are using the correct client_secret', ''))
+        assert auth.token is None
+        self.assertEqual(fetch_token_mock.call_count, 1)
         timer_mock().start.assert_called_once_with()
 
     @patch('threading.Timer')
@@ -170,8 +189,8 @@ class TestMisfitAuth(unittest.TestCase):
             scope=['public', 'birthday', 'email'], success_html="""
             <h1>You are now authorized to access the Misfit API!</h1>
             <br/><h3>You can close this window</h3>""", failure_html="""
-            <h1>ERROR: We were unable to authorize to use the Misfit API.</h1>
-            <br/><h3>You can close this window</h3>""", state=None):
+            <h1>ERROR: %s</h1><br/><h3>You can close this window</h3>%s""",
+            state=None):
         """
         Verify all the MisfitAuth member variables are as they should be
         """
