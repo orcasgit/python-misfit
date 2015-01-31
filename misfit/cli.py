@@ -65,7 +65,10 @@ class MisfitCli:
     def read_config(self):
         """ Read credentials from the config file """
         with open(self.config_file) as cfg:
-            self.config.readfp(cfg)
+            try:
+                self.config.read_file(cfg)
+            except AttributeError:  # Not python 3.X fallback
+                self.config.readfp(cfg)
         self.client_id = self.config.get('misfit', 'client_id')
         self.client_secret = self.config.get('misfit', 'client_secret')
         self.access_token = self.config.get('misfit', 'access_token')
