@@ -33,21 +33,21 @@ class TestMisfitNotification(unittest.TestCase):
             'SubscribeURL': 'https://example-subscribe-url.com/path/to/verify_endpoint?verify_token=long_token&challenge=challenge',
             'Token': 'very_long_token',
             'Message': 'You have chosen to subscribe to the topic arn:aws:sns:us-east-1:<number>:topic.\nTo confirm the subscription, visit the SubscribeURL included in this message.',
-            'MessageId' : 'message-id',
+            'MessageId': 'message-id',
             'Type': 'SubscriptionConfirmation',
             'SignatureVersion': '1',
             'SigningCertURL': 'https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem',
             'TopicArn': 'arn:aws:sns:us-east-1:<number>:topic'
         }
         self.notification = {
-            "Type" : "Notification",
-            "MessageId" : "message-id",
-            "TopicArn" : "topic-arn",
-            "Message" : "[{\"type\":\"goals\",\"id\":\"scrubbed\",\"ownerId\":\"scrubbed\",\"action\":\"updated\",\"updatedAt\":\"2014-12-11T20:23:43Z\"}]",
-            "Timestamp" : "2014-12-11T20:23:44.182Z",
-            "SignatureVersion" : "1",
-            "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
-            "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=subscription-arn"
+            "Type": "Notification",
+            "MessageId": "message-id",
+            "TopicArn": "topic-arn",
+            "Message": "[{\"type\":\"goals\",\"id\":\"scrubbed\",\"ownerId\":\"scrubbed\",\"action\":\"updated\",\"updatedAt\":\"2014-12-11T20:23:43Z\"}]",
+            "Timestamp": "2014-12-11T20:23:44.182Z",
+            "SignatureVersion": "1",
+            "SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+            "UnsubscribeURL": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=subscription-arn"
         }
         # Generate a signature for the necessary messages
         # privkey.pem created with the following command:
