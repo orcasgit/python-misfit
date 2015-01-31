@@ -10,6 +10,7 @@ Usage:
   misfit session (--start_date=<start_date> --end_date=<end_date>|--object_id=<object_id>) [--user_id=<user_id>] [--config=<config_file>]
   misfit sleep (--start_date=<start_date> --end_date=<end_date>|--object_id=<object_id>) [--user_id=<user_id>] [--config=<config_file>]
   misfit --version
+  misfit --help
 
 Options:
   -h --help                        Show this screen.
@@ -30,9 +31,9 @@ from docopt import docopt
 from pprint import PrettyPrinter
 from six.moves import configparser
 
-from . import __version__
-from .auth import MisfitAuth
-from .misfit import Misfit
+from misfit import __version__
+from misfit.auth import MisfitAuth
+from misfit.misfit import Misfit
 
 
 class MisfitCli:
@@ -50,7 +51,7 @@ class MisfitCli:
             self.client_id = arguments['--client_id']
             self.client_secret = arguments['--client_secret']
             self.authorize()
-        elif not arguments['--version']:
+        elif not arguments['--version'] and not arguments['--help']:
             try:
                 # Fail if config file doesn't exist or is missing information
                 self.read_config()

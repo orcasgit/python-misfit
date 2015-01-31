@@ -5,6 +5,7 @@ import sys
 
 from docopt import DocoptExit
 from httmock import HTTMock
+from imp import load_source
 from mock import patch
 from nose.tools import eq_, ok_
 from requests import Request
@@ -28,6 +29,7 @@ class TestMisfitCli(unittest.TestCase):
             '--end_date': None,
             '--user_id': None,
             '--version': False,
+            '--help': False,
             'authorize': False,
             'device': False,
             'goal': False,
@@ -40,20 +42,30 @@ class TestMisfitCli(unittest.TestCase):
     @patch('misfit.cli.MisfitCli')
     @patch('sys.exit')
     def test_main(self, exit_mock, cli_mock):
+        """ Test the main() function and running cli as a module """
+
         # Docopt raises an error when no arguments are passed
         self.assertRaises(DocoptExit, main)
         self.assertEqual(exit_mock.call_count, 0)
         self.assertEqual(cli_mock.call_count, 0)
 
-        # Docopt raises an error (and exits) when the argument is --help
-        sys.argv = ['misfit', '--help']
-        self.assertRaises(DocoptExit, main)
-        self.assertEqual(exit_mock.call_count, 1)
+        # Test running: python -m misfit.cli
+        cli_path = os.path.abspath(os.path.join('misfit', 'cli.py'))
+        self.assertRaises(DocoptExit, load_source, '__main__', cli_path)
+        self.assertEqual(exit_mock.call_count, 0)
         self.assertEqual(cli_mock.call_count, 0)
-        exit_mock.reset_mock()
 
-        # Docopt doesn't raise an error when the argument is --version
-        # The MisfitCli object gets created in this case
+        # Test the --help argument
+        sys.argv = ['misfit', '--help']
+        main()
+        self.assertEqual(exit_mock.call_count, 1)
+        version_arguments = self.default_arguments.copy()
+        version_arguments['--help'] = True
+        cli_mock.assert_called_once_with(version_arguments)
+
+        # Test the --version argument
+        cli_mock.reset_mock()
+        exit_mock.reset_mock()
         sys.argv = ['misfit', '--version']
         main()
         self.assertEqual(exit_mock.call_count, 1)
