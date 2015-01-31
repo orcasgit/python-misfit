@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import cherrypy
 import json
 import os
+import threading
 import unittest
 
 from mock import patch
@@ -15,8 +16,10 @@ from requests_oauthlib import OAuth2Session
 from misfit.auth import MisfitAuth
 from misfit.misfit import API_URL
 
+from . import TestMisfitBase
 
-class TestMisfitAuth(unittest.TestCase):
+
+class TestMisfitAuth(TestMisfitBase):
     def setUp(self):
         self.client_id = 'FAKE_CLIENT_ID'
         self.client_secret = 'FAKE_CLIENT_SECRET'
@@ -102,7 +105,8 @@ class TestMisfitAuth(unittest.TestCase):
         # Mock the state generation function so we know what it returns
         new_state_mock.return_value = self.state
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
-        auth.browser_authorize()
+        with self.wait_for_thread(open_mock):
+            auth.browser_authorize()
         open_mock.assert_called_once_with(auth.authorize_url())
         quickstart_mock.assert_called_once_with(auth)
 
@@ -167,22 +171,26 @@ class TestMisfitAuth(unittest.TestCase):
         self.assertEqual(fetch_token_mock.call_count, 1)
         timer_mock().start.assert_called_once_with()
 
-    @patch('threading.Timer')
-    def test_shutdown_cherrypy(self, timer_mock):
+    @patch('cherrypy.engine.exit')
+    def test_shutdown_cherrypy(self, exit_mock):
         """
         Test that the _shutdown_cherrypy method shuts down the cherrypy server
         if it's running.
         """
         # No shutdown if the server isn't running
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
-        auth._shutdown_cherrypy()
-        self.assertEqual(timer_mock().start.call_count, 0)
+        with patch('threading.Timer') as timer_mock:
+            auth._shutdown_cherrypy()
+            self.assertEqual(timer_mock().start.call_count, 0)
+        self.assertEqual(exit_mock.call_count, 0)
 
         # Make sure the server shuts down, if it is running
         auth = MisfitAuth(self.client_id, self.client_secret, **self.kwargs)
         cherrypy.engine.state = cherrypy.engine.states.STARTED
-        auth._shutdown_cherrypy()
-        timer_mock().start.assert_called_once_with()
+        with self.wait_for_thread(exit_mock):
+            auth._shutdown_cherrypy()
+        self.assertEqual(exit_mock.call_count, 1)
+        exit_mock.assert_called_once_with()
 
     def _verify_member_vars(
             self, auth, redirect_uri='http://127.0.0.1:8080/',

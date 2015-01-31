@@ -1,5 +1,6 @@
 import json
 import os
+import threading
 import unittest
 import sys
 
@@ -14,10 +15,11 @@ from six.moves import configparser
 
 from misfit.cli import main, MisfitCli
 
+from . import TestMisfitBase
 from .mocks import MisfitHttMock
 
 
-class TestMisfitCli(unittest.TestCase):
+class TestMisfitCli(TestMisfitBase):
     def setUp(self):
         self.default_arguments = {
             '--client_id': None,
@@ -95,7 +97,8 @@ class TestMisfitCli(unittest.TestCase):
             '--client_id': 'FAKE_CLIENT_ID',
             '--client_secret': 'FAKE_CLIENT_SECRET'
         })
-        MisfitCli(auth_arguments)
+        with self.wait_for_thread(open_mock):
+            MisfitCli(auth_arguments)
         auth_url = 'https://api.misfitwearables.com/auth/dialog/authorize?response_type=code&client_id=FAKE_CLIENT_ID&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2F&scope=public+birthday+email&state=FAKE_STATE'
         open_mock.assert_called_once_with(auth_url)
         eq_(sys.stdout.getvalue(),
@@ -174,8 +177,6 @@ class TestMisfitCli(unittest.TestCase):
         eq_(cli.client_id, lines[3].split(' = ')[1])
         # Remove the test config we created
         os.remove(config_arguments['--config'])
-
-
 
     @patch('pprint.PrettyPrinter.pprint')
     def test_summary(self, pprint_mock):

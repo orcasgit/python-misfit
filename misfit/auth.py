@@ -69,7 +69,9 @@ class MisfitAuth:
         Open a browser to the authorization url and spool up a CherryPy
         server to accept the response
         """
-        webbrowser.open(self.authorize_url())
+        url = self.authorize_url()
+        # Open the web browser in a new thread for command-line browser support
+        threading.Timer(1, webbrowser.open, args=(url,)).start()
         cherrypy.quickstart(self)
 
     @cherrypy.expose
@@ -90,6 +92,7 @@ class MisfitAuth:
                 error = self._fmt_failure('CSRF Warning! Mismatching state')
         else:
             error = self._fmt_failure('Unknown error while authenticating')
+        # Use a thread to shutdown cherrypy so we can return HTML first
         self._shutdown_cherrypy()
         return error if error else self.success_html
 
@@ -99,5 +102,6 @@ class MisfitAuth:
         return self.failure_html % (message, tb_html)
 
     def _shutdown_cherrypy(self):
+        """ Shutdown cherrypy in one second, if it's running """
         if cherrypy.engine.state == cherrypy.engine.states.STARTED:
-            threading.Timer(1, lambda: cherrypy.engine.exit()).start()
+            threading.Timer(1, cherrypy.engine.exit).start()
