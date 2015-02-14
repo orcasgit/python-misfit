@@ -8,3 +8,4 @@ misfit.egg-info
 __pycache__
 *.pyc
 *.egg
+docs/_build
