@@ -274,7 +274,7 @@ texinfo_documents = [
 epub_title = 'Python-Misfit'
 epub_author = 'ORCAS'
 epub_publisher = 'ORCAS'
-epub_copyright = '2015, ORCAS'
+epub_copyright = misfit.__copyright__
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = 'Python-Misfit'
