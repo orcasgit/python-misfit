@@ -13,8 +13,31 @@ python-misfit
 
 Misfit API Python Client Implementation
 
+.. _README-Requirements:
+
+Requirements
+============
+
+* Python >= 2.6, Python >= 3.2, or PyPy. You can download it from `here <https://www.python.org/>`_
+* Pip. If you have Python >= 2.7.9 or >= 3.4 then you already have ``pip``. Otherwise, please follow `these instructions <https://pip.pypa.io/en/latest/installing.html>`_
+
+.. _README-Installing:
+
+Installing
+==========
+
+Once you have satisfied the requirements listed above, install by running the
+following command from the
+`terminal <http://cli.learncodethehardway.org/book/ex1.html>`_: ::
+
+    pip install misfit
+
+.. _README-Installing-End:
+
 Quick Start
 ===========
+
+.. _README-Quick-Start:
 
 Install with ``pip install misfit``
 
@@ -35,8 +58,12 @@ same resources using the Python API: ::
     >>> print(misfit.profile())
     {u'gender': u'male', u'birthday': u'1981-07-18', u'userId': u'scrubbed', u'name': u'Brad Pitcher'}
 
+.. _README-Quick-Start-End:
+
 Slow Start
 ==========
+
+.. _README-Slow-Start:
 
 After you have installed and `created your misfit app <https://build.misfit.com/apps>`_
 you can authorize and use the API with your own web server rather than the
@@ -57,6 +84,8 @@ needed for further API calls: ::
     >>> misfit = Misfit(<client_id>, <client_secret>, <access_token>)
     >>> print(misfit.profile())
     {u'gender': u'male', u'birthday': u'1981-07-18', u'userId': u'scrubbed', u'name': u'Brad Pitcher'}
+
+.. _README-Notifications:
 
 Notifications
 =============
@@ -102,8 +131,3 @@ well, the verification should seamlessly take place. If not, please
 `file an issue <https://github.com/orcasgit/python-misfit/issues>`_ and we will
 try and help you debug. Now switch on all the resources you would like to
 receive and click "Update". Soon you will be receiving Misfit notifications!
-
-Requirements
-============
-
-* Python 2.6+, 3.2+ and PyPy
