@@ -3,13 +3,20 @@
 Python-Misfit: It's an API client
 =================================
 
-.. automodule:: misfit
+.. include:: ../misfit/__init__.py
+   :start-after: """
+   :end-before: """
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   installing
+   getting_started
+   notifications
+   misfit
+   history
 
 
 Indices and tables
