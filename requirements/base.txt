@@ -1,7 +1,7 @@
-arrow>=0.4.0,<0.5.0
-cryptography>=0.7,<0.8
-CherryPy>=3.6.0,<3.7.0
-docopt>=0.6.0,<0.7.0
-requests-oauthlib>=0.4.0,<0.5.0
-six>=1.8.0,<1.9.0
-slumber>=0.6.0,<0.7.0
+arrow>0.5.4,<0.7
+cryptography>=0.7,<1.1
+CherryPy>=3.6,<3.9
+docopt>=0.6,<0.7
+requests-oauthlib>=0.4,<0.6
+six>=1.8,<1.10
+slumber>=0.7,<0.8
