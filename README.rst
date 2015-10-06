@@ -119,7 +119,7 @@ deliver it again. A full workflow should look something like this: ::
     >>> notification = MisfitNotification(content)
     >>> if notification.Type == 'Notification':
     >>>    for message in notification.Message:
-    >>>        if message['type'] == 'goals':
+    >>>        if message.type == 'goals':
     >>>            # Handle goal update
     >>>        # Handle other message types
     >>> # Give an empty response with a 200 status code
