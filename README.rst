@@ -10,6 +10,9 @@ python-misfit
 .. image:: https://requires.io/github/orcasgit/python-misfit/requirements.svg?branch=master
    :target: https://requires.io/github/orcasgit/python-misfit/requirements/?branch=master
    :alt: Requirements Status
+.. image:: https://readthedocs.org/projects/python-misfit/badge/?version=latest
+   :target: http://python-misfit.readthedocs.org/en/latest/?badge=latest
+   :alt: Documentation Status
 
 Misfit API Python Client Implementation
 

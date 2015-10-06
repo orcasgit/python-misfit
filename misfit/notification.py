@@ -22,6 +22,10 @@ def string_to_sign(data):
 
 
 class MisfitMessage(MisfitObject):
+    """
+    DELETED, CREATED and UPDATED are the three known actions you will find in
+    the ``action`` property
+    """
     DELETED = 'deleted'
     CREATED = 'created'
     UPDATED = 'updated'
