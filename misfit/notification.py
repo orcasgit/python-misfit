@@ -22,7 +22,9 @@ def string_to_sign(data):
 
 
 class MisfitMessage(MisfitObject):
-    pass
+    DELETED = 'deleted'
+    CREATED = 'created'
+    UPDATED = 'updated'
 
 
 class MisfitNotification(MisfitObject):

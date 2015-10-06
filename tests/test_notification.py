@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from httmock import HTTMock
 from nose.tools import eq_, ok_
 
-from misfit.notification import MisfitNotification
+from misfit.notification import MisfitMessage, MisfitNotification
 
 from .mocks import sns_certificate, sns_subscribe
 
@@ -43,7 +43,7 @@ class TestMisfitNotification(unittest.TestCase):
             "Type": "Notification",
             "MessageId": "message-id",
             "TopicArn": "topic-arn",
-            "Message": "[{\"type\":\"goals\",\"id\":\"scrubbed\",\"ownerId\":\"scrubbed\",\"action\":\"updated\",\"updatedAt\":\"2014-12-11T20:23:43Z\"}]",
+            "Message": """[{"type":"goals","id":"scrubbed_id","ownerId":"scrubbed_ownerId","action":"updated","updatedAt":"2014-12-11T20:23:43Z"}]""",
             "Timestamp": "2014-12-11T20:23:44.182Z",
             "SignatureVersion": "1",
             "SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
@@ -60,13 +60,27 @@ class TestMisfitNotification(unittest.TestCase):
         strings_to_sign = {
             # Hardcode these so our test suite is less of an echo chamber
             'signed_confirmation': 'Message\nYou have chosen to subscribe to the topic arn:aws:sns:us-east-1:<number>:topic.\nTo confirm the subscription, visit the SubscribeURL included in this message.\nMessageId\nmessage-id\nSubscribeURL\nhttps://example-subscribe-url.com/path/to/verify_endpoint?verify_token=long_token&challenge=challenge\nTimestamp\n2014-12-11T19:21:18.852Z\nToken\nvery_long_token\nTopicArn\narn:aws:sns:us-east-1:<number>:topic\nType\nSubscriptionConfirmation\n',
-            'notification': 'Message\n[{"type":"goals","id":"scrubbed","ownerId":"scrubbed","action":"updated","updatedAt":"2014-12-11T20:23:43Z"}]\nMessageId\nmessage-id\nTimestamp\n2014-12-11T20:23:44.182Z\nTopicArn\ntopic-arn\nType\nNotification\n'
+            'notification': 'Message\n[{"type":"goals","id":"scrubbed_id","ownerId":"scrubbed_ownerId","action":"updated","updatedAt":"2014-12-11T20:23:43Z"}]\nMessageId\nmessage-id\nTimestamp\n2014-12-11T20:23:44.182Z\nTopicArn\ntopic-arn\nType\nNotification\n'
         }
         for message, string_to_sign in strings_to_sign.items():
             signer = key.signer(PKCS1v15(), hashes.SHA1())
             signer.update(string_to_sign.encode('utf8'))
             signature = standard_b64encode(signer.finalize())
             getattr(self, message)['Signature'] = signature.decode('utf8')
+
+    def test_message(self):
+        """
+        Test the MisfitMessage class
+        """
+        eq_(MisfitMessage.DELETED, 'deleted')
+        eq_(MisfitMessage.CREATED, 'created')
+        eq_(MisfitMessage.UPDATED, 'updated')
+        message = MisfitMessage(json.loads(self.notification['Message'])[0])
+        eq_(message.type, 'goals')
+        eq_(message.updatedAt, arrow.get("2014-12-11T20:23:43Z"))
+        eq_(message.action, MisfitMessage.UPDATED)
+        eq_(message.id, 'scrubbed_id')
+        eq_(message.ownerId, 'scrubbed_ownerId')
 
     def test_init(self):
         """
@@ -103,12 +117,9 @@ class TestMisfitNotification(unittest.TestCase):
         eq_(notification.Type, self.notification['Type'])
         eq_(notification.MessageId, self.notification['MessageId'])
         eq_(notification.TopicArn, self.notification['TopicArn'])
-        for i, message in enumerate(json.loads(self.notification['Message'])):
-            eq_(notification.Message[i].type, message['type'])
-            eq_(notification.Message[i].updatedAt, arrow.get(message['updatedAt']))
-            eq_(notification.Message[i].action, message['action'])
-            eq_(notification.Message[i].id, message['id'])
-            eq_(notification.Message[i].ownerId, message['ownerId'])
+        messages = json.loads(self.notification['Message'])
+        eq_(len(notification.Message), 1)
+        eq_(notification.Message[0].id, messages[0]['id'])
         eq_(notification.Timestamp, arrow.get(self.notification['Timestamp']))
         eq_(notification.Signature, self.notification['Signature'])
         eq_(notification.SignatureVersion,
