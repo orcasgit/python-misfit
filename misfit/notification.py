@@ -21,6 +21,10 @@ def string_to_sign(data):
     return '\n'.join(strings).encode('utf8')
 
 
+class MisfitMessage(MisfitObject):
+    pass
+
+
 class MisfitNotification(MisfitObject):
     def __init__(self, data):
         """ Load the JSON to a dict and verify the signature if applicable """
@@ -29,12 +33,8 @@ class MisfitNotification(MisfitObject):
         if hasattr(self, 'Signature'):
             self.verify_signature()
         if self.Type == 'Notification':
-            # Load the messages into a list of dicts, with arrow objects for
-            # dates
-            messages = json.loads(self.Message)
-            for i, message in enumerate(messages):
-                messages[i]['updatedAt'] = arrow.get(message['updatedAt'])
-            self.Message = messages
+            # Objectify the message list
+            self.Message = [MisfitMessage(m) for m in json.loads(self.Message)]
         elif self.Type == 'SubscriptionConfirmation':
             # If the notification is a subscription confirmation, fetch the
             # subscribe URL

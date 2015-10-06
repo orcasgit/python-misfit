@@ -103,9 +103,12 @@ class TestMisfitNotification(unittest.TestCase):
         eq_(notification.Type, self.notification['Type'])
         eq_(notification.MessageId, self.notification['MessageId'])
         eq_(notification.TopicArn, self.notification['TopicArn'])
-        messages = json.loads(self.notification['Message'])
-        messages[0]['updatedAt'] = arrow.get(messages[0]['updatedAt'])
-        eq_(notification.Message, messages)
+        for i, message in enumerate(json.loads(self.notification['Message'])):
+            eq_(notification.Message[i].type, message['type'])
+            eq_(notification.Message[i].updatedAt, arrow.get(message['updatedAt']))
+            eq_(notification.Message[i].action, message['action'])
+            eq_(notification.Message[i].id, message['id'])
+            eq_(notification.Message[i].ownerId, message['ownerId'])
         eq_(notification.Timestamp, arrow.get(self.notification['Timestamp']))
         eq_(notification.Signature, self.notification['Signature'])
         eq_(notification.SignatureVersion,

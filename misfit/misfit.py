@@ -88,7 +88,7 @@ class MisfitObject(UnicodeMixin):
             self.set_value(name, value)
 
     def set_value(self, name, value):
-        if name in ['date', 'datetime', 'startTime', 'Timestamp']:
+        if name in ['date', 'datetime', 'startTime', 'Timestamp', 'updatedAt']:
             setattr(self, name, arrow.get(value))
         else:
             setattr(self, name, value)
