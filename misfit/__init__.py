@@ -24,5 +24,5 @@ __author__ = 'ORCAS'
 __author_email__ = 'bpitcher@orcasinc.com'
 __copyright__ = 'Copyright 2014-2015 ORCAS'
 __license__ = 'Apache 2.0'
-__version__ = '0.2.0'
+__version__ = '0.3.1'
 __release__ = __version__

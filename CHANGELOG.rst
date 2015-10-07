@@ -1,3 +1,10 @@
+Version 0.3.1 (2015-10-06)
+==========================
+
+* Read the docs documentation
+* Handle time stamp conversion of the new Device.lastSyncTime field
+* MisfitNotification.Message is now a list of MisfitMessage objects
+
 Version 0.2.0 (2015-01-31)
 ==========================
 
