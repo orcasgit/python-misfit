@@ -10,6 +10,9 @@ python-misfit
 .. image:: https://requires.io/github/orcasgit/python-misfit/requirements.svg?branch=master
    :target: https://requires.io/github/orcasgit/python-misfit/requirements/?branch=master
    :alt: Requirements Status
+.. image:: https://readthedocs.org/projects/python-misfit/badge/?version=latest
+   :target: http://python-misfit.readthedocs.org/en/latest/?badge=latest
+   :alt: Documentation Status
 
 Misfit API Python Client Implementation
 
@@ -119,7 +122,7 @@ deliver it again. A full workflow should look something like this: ::
     >>> notification = MisfitNotification(content)
     >>> if notification.Type == 'Notification':
     >>>    for message in notification.Message:
-    >>>        if message['type'] == 'goals':
+    >>>        if message.type == 'goals':
     >>>            # Handle goal update
     >>>        # Handle other message types
     >>> # Give an empty response with a 200 status code

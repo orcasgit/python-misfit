@@ -26,6 +26,11 @@ misfit.cli module
    :end-before: """
 .. autoclass:: misfit.cli.MisfitCli
 
+misfit.notification module
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: misfit.notification
+
 misfit.exceptions module
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
