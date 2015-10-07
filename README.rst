@@ -21,7 +21,7 @@ Misfit API Python Client Implementation
 Requirements
 ============
 
-* Python >= 2.6, Python >= 3.2, or PyPy. You can download it from `here <https://www.python.org/>`_
+* Python >= 2.6, Python >= 3.3, or PyPy. You can download it from `here <https://www.python.org/>`_
 * Pip. If you have Python >= 2.7.9 or >= 3.4 then you already have ``pip``. Otherwise, please follow `these instructions <https://pip.pypa.io/en/latest/installing.html>`_
 
 .. _README-Installing:
