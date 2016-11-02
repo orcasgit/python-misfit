@@ -30,7 +30,7 @@ class MisfitHttpException(MisfitException):
         code = exc.response.status_code if hasattr(exc, 'response') else 500
         message = exc.message if hasattr(exc, 'message') else 'Unknown error'
         try:
-            json_content = json.loads(exc.content)
+            json_content = json.loads(exc.content.decode('utf8'))
         except ValueError:
             pass
         else:
