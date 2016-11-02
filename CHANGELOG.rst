@@ -1,3 +1,8 @@
+Version 0.3.2 (2016-11-02)
+==========================
+
+* Upgrade cryptography to work with newer openssl
+
 Version 0.3.1 (2015-10-06)
 ==========================
 
