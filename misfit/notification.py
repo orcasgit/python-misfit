@@ -53,8 +53,7 @@ class MisfitNotification(MisfitObject):
         raises cryptography.exceptions.InvalidSignature
         """
         # Get the signing certificate and public key from the specified URL
-        cert_url = self.data['SigningCertURL']
-        cert_str = requests.get(cert_url).content.encode('utf8')
+        cert_str = requests.get(self.data['SigningCertURL']).content
         cert = default_backend().load_pem_x509_certificate(cert_str)
         pubkey = cert.public_key()
         # Verify the signature
